@@ -1,0 +1,54 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+{/*
+  Stylized "ngọn nến" sticker — biểu tượng eligibility trace.
+  Một flame sáng (accent), thân nến (muted), wick.
+*/}
+<svg
+  viewBox="0 0 60 100"
+  aria-hidden="true"
+  class:list={["", className]}
+>
+  {/* Flame: 2 lớp, ngoài cam, trong vàng */}
+  <path
+    d="M30,8 C36,22 44,30 36,46 C32,54 28,54 24,46 C16,30 24,22 30,8 Z"
+    fill="#e89570"
+    opacity="0.85"></path>
+  <path
+    d="M30,18 C33,26 38,32 33,42 C31,46 29,46 27,42 C22,32 27,26 30,18 Z"
+    fill="#f3c08a"
+    opacity="0.9"></path>
+  {/* Wick */}
+  <line
+    x1="30"
+    y1="46"
+    x2="30"
+    y2="56"
+    stroke="#3a2e22"
+    stroke-width="1.3"
+    stroke-linecap="round"></line>
+  {/* Candle body */}
+  <rect
+    x="20"
+    y="56"
+    width="20"
+    height="38"
+    rx="3"
+    fill="#f3efe7"
+    stroke="#b9b09c"
+    stroke-width="1.2"></rect>
+  {/* Body shading */}
+  <line
+    x1="23"
+    y1="60"
+    x2="23"
+    y2="90"
+    stroke="#d4ccb4"
+    stroke-width="1"
+    opacity="0.6"></line>
+</svg>

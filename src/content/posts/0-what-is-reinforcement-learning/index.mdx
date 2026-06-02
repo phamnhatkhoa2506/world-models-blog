@@ -1,0 +1,131 @@
+---
+author: Phạm Nhật Khoa
+pubDatetime: 2026-05-24T13:00:00+07:00
+title: "Reinforcement Learning là gì?"
+slug: what-is-reinforcement-learning
+featured: true
+draft: false
+tags:
+  - reinforcement-learning
+  - deep-learning
+description: >-
+  Giới thiệu về Reinforcement Learning, lịch sử phát triển và các ứng dụng vào ngành AI hiện nay cũng như là góc nhìn cá nhân về Reinforcement Learning trong mảng AI hiện.
+---
+
+import AELoop from "./AE_loop.png";
+
+## Table of contents
+
+## 1. Reinformence Learning (Học tăng cường)
+Đối với các bạn đang học và nghiên cứu về Trí tuệ nhân tạo, có lẽ các bạn không còn xa lạ với khái niệm Reinforcement Learning. Từ nay để ngắn gọn, mình sẽ gọi tắt Reinforcement Learning là RL. RL được ứng dụng rất nhiều trong các lĩnh vực khác nhau, từ trò chơi, robot, đến các hệ thống tự động hóa. Nếu các bạn từng làm về mô hình ngôn ngữ lớn (Large Language Model - LLM), các bạn có thể thấy rằng LLM cũng sử dụng phương pháp gọi là Reinforcement Learning from Human Feedback (RLHF) để cải thiện chất lượng câu trả lời của mô hình. AlphaGo của Google từng được nổi lên là một ví dụ điển hình về RL trong lĩnh vực trò chơi. Ở bài post này, mình sẽ giới thiệu về RL và các khái niệm liên quan đến RL.
+Mình giới thiệu cho các bạn cuốn sách "Reinforcement Learning: An Introduction" của các tác giả Richard S. Sutton và Andrew G. Barto, đây là cuốn sách kinh điển trong lĩnh vực RL, được nhiều người nghiên cứu và học tập.
+
+### 1.1. Reinforcement Learning là gì?
+RL là một nhánh của Machine Learning, đứng bên cạnh các phương pháp như học có giám sát (Supervised Learning) và học không giám sát (Unsupervised Learning). Để hiểu rõ RL, ta cần biết vấn đề mà RL giải quyết là gì. RL được lấy ý tưởng từ cách mà con người chúng ta học ở thế giới thực, thông qua việc tương tác với môi trường, thu thập thông tin qua việc tương tác đó và đưa ra hành động cuối cùng. Có thể lấy ví dụ như khi chúng ta đang đạp xe ở trên đường, chúng ta cần quan sát các phương tiện khác, người đi bộ, đèn giao thông và đưa ra quyết định phù hợp để đảm bảo an toàn. Cũng có thể là khi chúng ta đang nấu ăn, chúng ta cần quan sát kỹ thức ăn, thu thập những thông tin ở món ăn để đưa ra các quyết định về điều chỉnh thời gian và nhiệt độ, thêm gia vị sao cho đúng với yêu cầu. Việc định nghĩa vấn đề mà RL giải quyết ở trên sẽ cho các bạn hiểu hơn về RL trong lý thuyết của trí tuệ nhân tạo.
+
+Trong lý thuyết trí tuệ nhân tạo, RL được xem như việc tác nhân AI (Agent) học như thế nào, làm sao để đưa ra hành động trong các tình huống, để tối đa phần thưởng nhận lại từ môi trường. Đây được xem là một <b><i>vòng lặp kín</i></b> bởi vì những hành động được đưa ra sẽ ảnh hưởng đến trạng thái tiếp theo của môi trường, từ đó ảnh hưởng đến phần thưởng nhận được, cứ như vậy lặp đi lặp lại. Phần thưởng (Reward) ở đây các bạn có thể hiểu là thứ giúp AI có thể đánh giá được hành động nó đưa ra có tốt hay không, nếu tốt thì sẽ được phần thưởng hoặc phần thưởng cao, nếu xấu thì sẽ không được phần thưởng hoặc phần thưởng thấp, tùy vào cách chúng ta định nghĩa cách trao phần thưởng. Hơn nữa, không ai nói rằng hành động nào sẽ được đưa ra, thay vào đó, AI sẽ phải tìm cách để đưa ra hành động sao cho nó nhận được nhiều phần thưởng nhất có thể. Tóm gọn lại, RL có 3 tính chất chính sau:
+* Là một vòng lặp kín
+* Không có hướng dẫn về việc đưa ra hành động và hệ quả như thế nào, trong đó có phần thưởng
+* Diễn ra trong thời gian kéo dài
+
+<figure style="text-align: center">
+  <img src={AELoop.src} alt="Vòng lặp của Reinforcement Learning"
+  width="400" />
+  <figcaption>Vòng lặp Agent–Environment trong Reinforcement
+  Learning</figcaption>
+</figure>
+
+Ở đây, ta có thể nhớ 2 thành phần quan trọng:
+* Agent: Tác nhân
+* Environment: Môi trường
+
+Những thành phần khác sẽ được giới thiệu ở phần 2.
+
+### 1.2. RL khác Supervised Learning (SL) và Unsupervised Learning (UL) như thế nào?
+Để hiểu rõ hơn về sự khác biệt của RL với 2 trường phái huấn luyện như SL và UL, ta cần phân tích kỹ hơn về cách thức hoạt động của từng phương pháp.
+
+Đối với SL, AI học từ tập dữ liệu đã được dán nhãn, được dán bởi một bên giám sát (có thể là con người, AI, hoặc có thể là bản thân AI đó). Mỗi mẫu dữ liệu trong tập dữ liệu này đều có một nhãn (label) xác định, và mục tiêu của AI là học cách dự đoán nhãn chính xác cho các mẫu dữ liệu mới. Điều này trái ngược với tính chất của RL, trong đó AI phải tự tìm ra cách hành xử tốt nhất thông qua tương tác với môi trường chứ không nhận được sự hướng dẫn ban đầu nào.
+
+Đối với UL, AI học từ tập dữ liệu không có nhãn, và mục tiêu của AI là học cách phát hiện các mẫu và cấu trúc ẩn của dữ liệu. Nhiều người có suy nghĩ rằng RL là một kiểu của UL bởi vì nó không dựa vào những mẫu hành động đúng nhưng RL khác UL ở chỗ là RL cố gắng tối ưu hóa phần thưởng chứ không tìm cấu trúc ẩn của dữ liệu. Những dữ liệu chưa được khám phá từ kinh nghiệm của một agent có thể hữu dụng trong RL nhưng bản thân RL cũng không chỉ ra được vấn đề tối ưu hóa phần thưởng của một agent RL.
+
+Vì vậy RL được xem là phương pháp huấn luyện thứ 3, bên cạnh SL, UL và các phương pháp huấn luyện khác.
+
+## 2. Các thành phần chính của Reinforcement Learning
+Bên cạnh tác nhân (Agent) và môi trường (Environment), chúng ta còn có các thành phần khác trong hệ thống RL như: chính sách (policy), phần thưởng (reward signal), hàm giá trị (value function) và một khái niệm khá ít gặp đó là mô hình của môi trường (model):
+* Chính sách (policy): Là quy tắc mà agent sử dụng để quyết định hành động dựa trên trạng thái hiện tại. Nó giống như một thứ trong tâm lý học, gọi là tập hợp các quy tắc kích thích - phản ứng (set of stimulus–response rules ). Trong một số trường hợp thì policy có thể là một hàm, một lookup table, hoặc một thuật toán giúp tìm kiếm action tốt nhất. Nhìn chung thì các policy đều ngẫu nhiên.
+* Phần thưởng (reward signal): là mục tiêu của một vấn đề trong RL. Mỗi bước thực hiện, môi trường sẽ gửi cho agent một reward. Reward thường là một số đơn lẻ. Agent sẽ cố gắng tối đa hóa phần thưởng trong suốt quá trình học. Reward mang tính chất tối ưu tức thời.
+* Hàm giá trị (value function): cũng là mục tiêu trong của vấn đề trong RL, nhưng khác với reward cho biết action nào là tốt trong từng bước, thì value function lại cho biết action nào là tốt trong suốt quá trình mà agent học. Value của được tính dựa trên việc thực hiện phép tính cộng dồn reward theo thời gian, từ khi agent bắt đầu học. Có thể hiểu được vài trò của value ở việc một action có thể không tốt ở step này nhưng sau nhiều step khác thì lại tốt, và ngược lại như vậy. Vì vậy value function mang tính chất tối ưu theo long-term.
+* Mô hình của môi trường (model): có thể xem model như là một thứ mô phòng lại environment thực tế. Hãy tưởng tượng bạn chơi một trận đá bóng, khi một cầu thủ sút quả bóng lên cao, trong khoảng thời gian bóng đang bay thì bạn không hề biết trước được điểm rơi của nó. Tuy nhiên, bạn có thể tưởng tượng được quỹ đạo và dự đoán được điểm rơi của bóng dựa trên kinh nghiệm của bạn. Việc làm như thế gọi là quá trình planning. Sau khi dự đoán được điểm rơi, bạn có thể đưa quyết định trước khi điều đó thực sự xảy ra. Model trong trường hợp này chính là sự mô phỏng, tưởng tượng môi trường của quả bóng, quỹ đạo, điểm rơi của bạn. Trong RL, những phương pháp sử dụng ý tưởng tương tự như trên gọi là model-based methods, những phương pháp không làm như thế thì gọi là model-free methods.
+
+Có thêm một số điểm về reward và value mà các bạn có thể biết để nắm rõ hơn. Reward là thành phần chính, value chỉ là thành phần quan trọng thứ 2. Điều này có thể hiểu được qua việc value được tính dựa trên reward và reward là thứ được tính trước và được tính trong mỗi step. Không có reward thì việc tính value cũng trở nên vô nghĩa. Tuy nhiên, việc lựa chọn action lại được thực hiện dựa trên sự đánh giá value. Chúng ta sẽ tìm action tạo ra trạng thái có value lớn nhất, không phải là reward lớn nhất. Trong quá trình học RL, các bạn có thể thấy nhiều phương pháp value estimation, tùy vào mục đích mà các phương pháp sẽ tối ưu theo nhiều kiểu khác nhau. Và vì như vậy, việc quan trọng nhất trong hầu hết các thuật toán RL đó chính là làm sao để thực hiện value estimation hiệu quả nhất.
+
+## 3. Ví dụ về trò Tic-tac-toe
+Để hiểu rõ ý tưởng cốt lõi của RL và thấy được sự khác biệt của nó so với các phương pháp tiếp cận khác, chúng ta hãy cùng xem xét một ví dụ kinh điển: trò chơi Tic-Tac-Toe (Cờ ca-rô 3x3).
+
+Luật chơi rất đơn giản: hai người luân phiên đánh dấu X và O trên bàn cờ 3x3. Ai tạo được một đường thẳng (ngang, dọc, chéo) với 3 dấu của mình trước sẽ thắng. Nếu bàn cờ kín chỗ mà không ai đạt điều kiện trên, kết quả là hòa.
+
+Giả sử chúng ta đang đối đầu với một người chơi không hoàn hảo – thỉnh thoảng họ sẽ đi những nước sai lầm và tạo cơ hội cho chúng ta chiến thắng. Làm thế nào để lập trình một AI có thể tự tìm ra điểm yếu của đối thủ và tối đa hóa tỷ lệ chiến thắng?
+
+### 3.1. Tại sao các phương pháp truyền thống lại "chào thua"?
+Trò chơi tuy đơn giản nhưng lại khó giải quyết triệt để bằng các kỹ thuật AI cổ điển:
+* Minimax (Lý thuyết trò chơi): Thuật toán này mặc định đối thủ luôn chơi một cách hoàn hảo nhất. Do đó, nó sẽ bỏ lỡ những cơ hội chiến thắng rủi ro cao nhưng hoàn toàn có thể xảy ra khi đối thủ mắc sai lầm.
+* Quy hoạch động (Dynamic Programming): Có thể tính toán được giải pháp tối ưu, nhưng lại đòi hỏi bạn phải có toàn bộ dữ liệu về đối thủ từ trước (ví dụ: xác suất đối thủ đi từng nước ở mọi trạng thái bàn cờ). Trong thực tế, chúng ta hiếm khi có sẵn dữ liệu này.
+* Phương pháp Tiến hóa (Evolutionary Methods): Thuật toán này sẽ tạo ra vô số các "chính sách" (cách đánh) và chơi thử nghiệm. Vấn đề là nó chỉ đánh giá kết quả sau khi ván cờ đã kết thúc. Nếu AI thắng, nó sẽ ghi nhận toàn bộ ván cờ đó là tốt, bỏ qua việc phân tích xem nước đi nào thực sự mang tính quyết định, hoặc thậm chí khen thưởng cho cả những nước cờ chưa từng được đánh ra!
+
+Học Tăng Cường không đánh giá ở cuối ván cờ. Nó đánh giá và học hỏi từ từng nước đi ngay trong quá trình chơi.
+
+### 3.2. Cách tiếp cận của RL: Step-by-step Learning
+Thay vì đánh giá toàn bộ chiến thuật mù quáng, RL sử dụng một khái niệm gọi là Hàm giá trị (Value Function).
+1. Khởi tạo Bảng giá trị
+Đầu tiên, hệ thống tạo một bảng lưu trữ toàn bộ các trạng thái bàn cờ có thể xảy ra. Mỗi trạng thái được gán một con số, đại diện cho xác suất chiến thắng ước tính nếu ván cờ đang ở trạng thái đó.
+Trạng thái đã có 3 chữ X (Chúng ta thắng) = 1
+Trạng thái đối thủ có 3 chữ O hoặc hòa = 0
+Tất cả các trạng thái còn lại = 0.5 (Tỷ lệ thắng 50/50).
+2. Khám phá (Exploration) và Khai thác (Exploitation)
+AI sẽ chơi rất nhiều ván cờ với đối thủ. Ở mỗi lượt, nó xem xét các trạng thái có thể xảy ra tiếp theo và tra cứu điểm số của chúng trong bảng.
+Phần lớn thời gian, AI sẽ đi nước tham lam (greedy): Chọn nước đi dẫn đến trạng thái có điểm số cao nhất.
+Thỉnh thoảng, AI sẽ chọn một nước đi khám phá (exploratory) hoàn toàn ngẫu nhiên. Điều này giúp nó trải nghiệm những thế cờ mới mà nó có thể sẽ không bao giờ thấy nếu chỉ đi theo lối mòn cũ.
+3. Cập nhật Giá trị bằng Chênh lệch Thời gian (Temporal-Difference)
+Đây là phép thuật cốt lõi của RL. Trong quá trình chơi, AI liên tục điều chỉnh giá trị của các thế cờ. Sau mỗi nước đi tham lam, nó sẽ "cập nhật ngược" giá trị của trạng thái trước đó cho gần sát với giá trị của trạng thái sau đó.
+Công thức cập nhật được biểu diễn như sau:
+$V(s) \leftarrow V(s) + \alpha [V(s') - V(s)]$
+Trong đó:
+- $s$ là trạng thái trước khi đi.
+- $s'$ là trạng thái sau khi đi.
+- $V(s)$ là giá trị ước tính hiện tại của trạng thái.
+- $\alpha$ là tham số bước học (step-size parameter), quyết định tốc độ học hỏi của mô hình.
+Việc cập nhật dựa trên sự khác biệt giữa hai ước tính ở hai thời điểm khác nhau chính là lý do phương pháp này được gọi là Học chênh lệch thời gian (Temporal-Difference Learning). Nếu $\alpha$ được điều chỉnh giảm dần hợp lý, AI sẽ hội tụ về một chính sách chơi tối ưu nhất để đánh bại đối thủ. 
+
+### 3.3. Sức mạnh của RL vượt xa cờ Caro
+Ví dụ về Tic-Tac-Toe cho thấy một hệ thống RL có thể biết cách lên kế hoạch, giăng bẫy đối thủ mà không cần một mô hình giả lập phức tạp. Tuy nhiên, đừng để sự đơn giản của ví dụ này đánh lừa bạn. Học Tăng Cường có thể làm được nhiều hơn thế:
+* Không gian trạng thái khổng lồ: Trò cờ thỏ cáo (Backgammon) có tới 10^20 trạng thái bàn cờ. Bằng cách kết hợp thuật toán RL với Mạng neuron nhân tạo (như dự án TD-Gammon năm 1992), hệ thống không cần phải trải nghiệm hết mọi trạng thái mà vẫn có thể khái quát hóa và thi đấu ngang ngửa với các nhà vô địch thế giới.
+* Vô hạn và liên tục: RL không chỉ áp dụng cho các trò chơi chia theo từng ván, mà còn xử lý các vấn đề tiếp diễn vô tận hoặc theo thời gian thực (continuous-time problems) trong robot hay điều khiển hệ thống.
+* Không cần mô hình (Model-free): Trong Tic-Tac-Toe, AI không hề có bất kỳ dữ liệu mô phỏng nào về tâm lý đối thủ. Nhờ tính chất model-free, RL tỏ ra cực kỳ ưu việt trong các bài toán mà việc xây dựng mô hình giả lập môi trường là quá khó hoặc bất khả thi.
+
+Dù là hoạt động ở những nước đi vi mô hay điều phối các chiến lược vĩ mô phức tạp, RL đã chứng minh nó là một trong những lối tiếp cận tự nhiên và mạnh mẽ nhất để tiến gần hơn tới Trí tuệ Nhân tạo đích thực.
+
+## 4. Lịch sử của Reinforcement Learning
+Lịch sử của RL có 3 nhánh chính:
+* Nhánh 1: Điều khiển Tối ưu (Optimal Control) và Quy hoạch Động (Dynamic Programming).
+* Nhánh 2: Học Thử-và-Sai (Trial-and-Error Learning)
+* Nhánh 3: Học Chênh lệch Thời gian (Temporal-Difference Learning)
+
+Chúng ta đi vào từng nhánh để biết xem từng nhánh có những đặc điểm gì.
+
+### 4.1. Điều khiển Tối ưu (Optimal Control) và Quy hoạch Động (Dynamic Programming)
+Thời gian bắt đầu phát triển vào cuối những năm 1950. Richard Bellman và các cộng sự đã phát triển Quy hoạch động, sử dụng các khái niệm như trạng thái (state), hàm giá trị (value function) và phương trình Bellman. Ông cũng giới thiệu Quá trình Quyết định Markov (MDPs). Các phương pháp này thường mắc phải "lời nguyền chiều số" (curse of dimensionality) vì yêu cầu tính toán tăng cấp số nhân theo biến trạng thái. Ban đầu, quy hoạch động hiếm khi được liên kết với "học" (learning) vì nó chủ yếu tính toán ngoại tuyến (offline) và cần mô hình môi trường hoàn hảo. Paul Werbos (1977) là một trong những người đầu tiên đề xuất sự kết hợp này. Tới năm 1989, thuật toán Q-learning của Chris Watkins đã chính thức tích hợp quy hoạch động với học trực tuyến (on-line learning).
+
+### 4.2. Học Thử-và-Sai (Trial-and-Error Learning)
+Bắt nguồn từ tâm lý học hành vi động vật thế kỷ 19 (Alexander Bain, 1850s). Đóng góp cốt lõi: Dựa trên "Quy luật Hiệu ứng" (Law of Effect) do Edward Thorndike đưa ra năm 1911: các hành động mang lại kết quả tốt sẽ được củng cố và lặp lại, ngược lại sẽ bị loại bỏ. Trí tuệ Nhân tạo sơ khai: Các nhà tiên phong AI như Alan Turing (1948), Claude Shannon (1952) và Marvin Minsky (1954) đã chế tạo các hệ thống mô phỏng việc học thử-và-sai. Năm 1961, Minsky nêu ra "bài toán phân bổ tín nhiệm" (credit assignment problem) – cốt lõi của RL hiện đại. Sự chững lại và hồi sinh: Vào thập niên 1960-1970, luồng này bị lu mờ do sự nhầm lẫn với Học có giám sát (Supervised Learning). Sau đó, Harry Klopf đã hồi sinh mảng này vào cuối những năm 1970 bằng cách nhấn mạnh vào khía cạnh hành vi hướng đích (tìm kiếm phần thưởng, tránh hình phạt), truyền cảm hứng trực tiếp cho các tác giả (Sutton & Barto).
+
+### 4.3. Học Chênh lệch Thời gian (Temporal-Difference Learning)
+Phương pháp này được thúc đẩy bởi sự chênh lệch giữa các dự đoán liên tiếp nhau theo thời gian cho cùng một đại lượng. Ý tưởng bắt nguồn từ khái niệm "củng cố thứ cấp" trong tâm lý học và được ứng dụng trên máy tính lần đầu bởi chương trình chơi cờ đam nổi tiếng của Arthur Samuel (1959).  Vào năm 1977, Ian Witten đã xuất bản quy tắc học chênh lệch thời gian sớm nhất. Đầu những năm 1980, Sutton và Barto đã kết hợp luồng này với học Thử-và-Sai để tạo ra kiến trúc Actor-Critic. Năm 1988, Sutton chính thức tách riêng nó thành một phương pháp dự đoán tổng quát (thuật toán TD).
+
+Vào cuối những năm 1980, sự ra đời của Q-learning (Watkins, 1989) đã chính thức hợp nhất cả ba luồng nghiên cứu trên. Sự thành công vang dội của chương trình chơi cờ TD-Gammon (Gerry Tesauro, 1992) đã thu hút sự chú ý khổng lồ của giới học thuật vào lĩnh vực này.
+
+Gần đây hơn, một nhánh khoa học thần kinh mới đã phát hiện ra sự tương đồng đáng kinh ngạc giữa các thuật toán Temporal-Difference và cách các tế bào thần kinh sản sinh dopamine hoạt động trong não bộ con người và động vật.
+
+## 5. Tổng kết
+RL là một cách tiếp cận tính toán nhằm hiểu và tự động hóa quá trình học tập cũng như ra quyết định hướng đích. Nó khác biệt so với các cách tiếp cận tính toán khác bởi sự nhấn mạnh vào việc học của một tác tử thông qua tương tác trực tiếp với môi trường của nó, mà không cần phụ thuộc vào sự giám sát mẫu hay các mô hình hoàn chỉnh về môi trường. RL là lĩnh vực đầu tiên giải quyết một cách nghiêm túc các vấn đề tính toán phát sinh khi học hỏi từ việc tương tác với môi trường để đạt được các mục tiêu dài hạn.
+
+RL sử dụng một khuôn khổ hình thức định nghĩa sự tương tác giữa một tác tử học và môi trường của nó dưới dạng các trạng thái, hành động và phần thưởng. Khuôn khổ này nhằm mục đích cung cấp một cách đơn giản để biểu diễn các đặc điểm thiết yếu của bài toán trí tuệ nhân tạo. Những đặc điểm này bao gồm ý thức về nguyên nhân và kết quả, ý thức về sự không chắc chắn và tính không tất định, cùng với sự tồn tại của các mục tiêu rõ ràng.

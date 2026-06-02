@@ -1,0 +1,71 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+{/* Não với bóng đèn ý tưởng — intelligence + insight */}
+<svg
+  viewBox="0 0 100 100"
+  aria-hidden="true"
+  class:list={[className]}
+>
+  {/* brain */}
+  <g transform="translate(15,40)">
+    <path
+      d="M5,18 Q-2,8 8,5 Q12,-3 22,2 Q30,-3 38,3 Q48,5 44,16 Q50,26 40,30 Q34,35 26,31 Q18,35 12,30 Q2,28 5,18 Z"
+      fill="#6ab39b"
+      stroke="#4f9d83"
+      stroke-width="1.3"
+      stroke-linejoin="round"></path>
+    {/* center fold */}
+    <path
+      d="M23,4 Q26,18 23,32"
+      stroke="#4f9d83"
+      stroke-width="1"
+      fill="none"
+      stroke-linecap="round"></path>
+    {/* squiggles */}
+    <path
+      d="M10,14 Q14,12 12,18"
+      stroke="#4f9d83"
+      stroke-width="0.7"
+      fill="none"></path>
+    <path
+      d="M35,14 Q31,12 33,18"
+      stroke="#4f9d83"
+      stroke-width="0.7"
+      fill="none"></path>
+    <path
+      d="M10,24 Q14,22 12,28"
+      stroke="#4f9d83"
+      stroke-width="0.7"
+      fill="none"></path>
+  </g>
+  {/* lightbulb spark top-right */}
+  <g transform="translate(72,22)">
+    <circle
+      cx="0"
+      cy="0"
+      r="7"
+      fill="#f3c08a"
+      stroke="#e89570"
+      stroke-width="1.2"></circle>
+    <circle cx="-2" cy="-2" r="2" fill="#fff4dd" opacity="0.85"></circle>
+    {/* rays */}
+    <g
+      stroke="#e89570"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    >
+      <line x1="0" y1="-10" x2="0" y2="-13"></line>
+      <line x1="8" y1="-8" x2="11" y2="-11"></line>
+      <line x1="11" y1="0" x2="14" y2="0"></line>
+      <line x1="-11" y1="0" x2="-14" y2="0"></line>
+      <line x1="-8" y1="-8" x2="-11" y2="-11"></line>
+      <line x1="7" y1="8" x2="9.5" y2="10.5"></line>
+      <line x1="-7" y1="8" x2="-9.5" y2="10.5"></line>
+    </g>
+  </g>
+</svg>

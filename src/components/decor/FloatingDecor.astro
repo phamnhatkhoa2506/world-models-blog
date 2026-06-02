@@ -1,0 +1,163 @@
+---
+import DreamCloud from "./DreamCloud.astro";
+import BrainSpark from "./BrainSpark.astro";
+import CrystalBall from "./CrystalBall.astro";
+import CompassRose from "./CompassRose.astro";
+import RobotHead from "./RobotHead.astro";
+import StarBurst from "./StarBurst.astro";
+import OrbitLoop from "./OrbitLoop.astro";
+import Galaxy from "./Galaxy.astro";
+import NeuralNet from "./NeuralNet.astro";
+import Candle from "./Candle.astro";
+
+interface Props {
+  variant?: "home" | "post" | "about";
+}
+const { variant = "home" } = Astro.props;
+
+/*
+  Stickers neo trong gutter ngoài content (max-w-5xl = 64rem).
+  Anchor formula: left|right = max(8px, calc(50vw - 32rem - <khoảng-cách>))
+  → khi viewport hẹp (xl=80rem), max(8px) kẹp ở mép; khi viewport rộng,
+  sticker float xa hơn ra ngoài.
+  Hidden < xl (1280px) để chắc không đè content.
+  Opacity thấp + mix-blend-multiply ở light mode để hoà vào nền giấy.
+*/
+
+const slot = "absolute h-28 w-28 2xl:h-36 2xl:w-36";
+const slotBig = "absolute h-32 w-32 2xl:h-40 2xl:w-40";
+const slotCandle = "absolute h-36 w-24 2xl:h-44 2xl:w-28";
+
+// Anchor offsets (px from viewport edge, only effective at viewport > 80rem)
+const leftFar = "max(8px,calc(50vw - 32rem - 12rem))";
+const leftMid = "max(8px,calc(50vw - 32rem - 10.5rem))";
+const rightFar = "max(8px,calc(50vw - 32rem - 12rem))";
+const rightMid = "max(8px,calc(50vw - 32rem - 10.5rem))";
+---
+
+<div
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 z-0 hidden overflow-hidden xl:block dark:mix-blend-screen"
+  style="mix-blend-mode: multiply;"
+>
+  {
+    variant === "home" && (
+      <>
+        {/* Left */}
+        <div
+          class:list={[slotBig, "opacity-30"]}
+          style={`top:6.5rem;left:${leftFar};`}
+        >
+          <DreamCloud class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slotBig, "opacity-35"]}
+          style={`top:50vh;left:${leftMid};`}
+        >
+          <RobotHead class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-30"]}
+          style={`bottom:6rem;left:${leftFar};`}
+        >
+          <Galaxy class="h-full w-full" />
+        </div>
+
+        {/* Right */}
+        <div
+          class:list={[slotBig, "opacity-35"]}
+          style={`top:5.5rem;right:${rightFar};`}
+        >
+          <BrainSpark class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-30"]}
+          style={`top:48vh;right:${rightMid};`}
+        >
+          <CompassRose class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-30"]}
+          style={`bottom:5rem;right:${rightFar};`}
+        >
+          <StarBurst class="h-full w-full" />
+        </div>
+      </>
+    )
+  }
+
+  {
+    variant === "post" && (
+      <>
+        <div
+          class:list={[slotBig, "opacity-25"]}
+          style={`top:7rem;left:${leftFar};`}
+        >
+          <CrystalBall class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-22"]}
+          style={`top:55vh;left:${leftMid};`}
+        >
+          <Galaxy class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slotBig, "opacity-22"]}
+          style={`bottom:7rem;left:${leftFar};`}
+        >
+          <OrbitLoop class="h-full w-full" />
+        </div>
+
+        <div
+          class:list={[slotCandle, "opacity-35"]}
+          style={`top:8rem;right:${rightMid};`}
+        >
+          <Candle class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-25"]}
+          style={`top:50vh;right:${rightMid};`}
+        >
+          <BrainSpark class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slotBig, "opacity-22"]}
+          style={`bottom:7rem;right:${rightFar};`}
+        >
+          <NeuralNet class="h-full w-full text-accent-soft" />
+        </div>
+      </>
+    )
+  }
+
+  {
+    variant === "about" && (
+      <>
+        <div
+          class:list={[slotBig, "opacity-30"]}
+          style={`top:8rem;left:${leftFar};`}
+        >
+          <DreamCloud class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slotBig, "opacity-32"]}
+          style={`bottom:8rem;left:${leftMid};`}
+        >
+          <RobotHead class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slot, "opacity-30"]}
+          style={`top:8rem;right:${rightMid};`}
+        >
+          <StarBurst class="h-full w-full" />
+        </div>
+        <div
+          class:list={[slotBig, "opacity-25"]}
+          style={`bottom:8rem;right:${rightFar};`}
+        >
+          <Galaxy class="h-full w-full" />
+        </div>
+      </>
+    )
+  }
+</div>

@@ -1,0 +1,179 @@
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  /* ===== Base body ===== */
+  html {
+    font-size: 17px;
+  }
+
+  @media (min-width: 1024px) {
+    html {
+      font-size: 18px;
+    }
+  }
+
+  /* ===== Override default Tailwind Typography styles ===== */
+  .app-prose {
+    @apply prose prose-lg max-w-none;
+    line-height: 1.75;
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      @apply text-foreground mb-3;
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    h1 {
+      @apply mt-8 text-4xl md:text-5xl;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    h2 {
+      @apply mt-12 text-3xl md:text-4xl;
+      line-height: 1.2;
+    }
+
+    h3 {
+      @apply mt-8 text-2xl md:text-3xl;
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    h4 {
+      @apply mt-6 text-xl;
+    }
+
+    th {
+      @apply text-foreground mb-3;
+      font-weight: 600;
+    }
+
+    p,
+    strong,
+    ol,
+    ul,
+    figcaption,
+    table,
+    code {
+      @apply text-foreground;
+    }
+
+    p {
+      @apply my-5;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    a {
+      @apply text-accent hover:text-accent-soft wrap-break-word decoration-dashed underline-offset-4 focus-visible:no-underline;
+    }
+
+    ul {
+      @apply overflow-x-clip;
+    }
+
+    li {
+      @apply marker:text-accent;
+    }
+
+    hr {
+      @apply border-border my-10;
+    }
+
+    img {
+      @apply border-border mx-auto rounded-md border;
+    }
+
+    figcaption {
+      @apply opacity-75;
+      font-family: var(--font-display);
+      font-style: italic;
+    }
+
+    table {
+      th,
+      td {
+        @apply border-border border p-2;
+      }
+
+      th {
+        @apply bg-muted/50 py-1.5;
+      }
+    }
+
+    code {
+      @apply bg-muted/75 text-foreground font-mono rounded px-1.5 py-0.5 text-[0.92em] wrap-break-word before:content-none after:content-none;
+    }
+
+    pre,
+    .astro-code,
+    .astro-code code {
+      @apply font-mono;
+    }
+
+    .astro-code code {
+      @apply flex-[1_0_100%] bg-inherit p-0;
+    }
+
+    blockquote {
+      @apply border-s-accent border-s-4 wrap-break-word bg-muted/30 my-6 rounded-r px-6 py-1 not-italic opacity-90;
+      font-family: var(--font-display);
+    }
+
+    blockquote p {
+      @apply my-3;
+    }
+
+    details {
+      @apply text-foreground inline-block cursor-pointer select-none [&_p]:hidden [&_ul]:my-0!;
+    }
+
+    summary {
+      @apply focus-visible:outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dashed;
+    }
+
+    pre {
+      @apply focus-visible:outline-accent focus-visible:border-transparent focus-visible:outline-2 focus-visible:outline-dashed rounded-md;
+    }
+  }
+
+  /* ===== KaTeX (math) ===== */
+  .prose .katex-display {
+    @apply text-foreground my-6 overflow-x-auto overflow-y-hidden py-2;
+  }
+
+  .prose .katex {
+    @apply text-foreground;
+    font-size: 1.05em;
+  }
+
+  /* ===== Code Blocks & Syntax Highlighting ===== */
+  .astro-code {
+    @apply outline-border flex border bg-(--shiki-light-bg) text-(--shiki-light) [&_span]:text-(--shiki-light) rounded-md;
+  }
+
+  html[data-theme="dark"] .astro-code {
+    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+  }
+
+  /* Styles for Shiki transformers */
+  .astro-code {
+    .line.diff.add {
+      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
+    }
+    .line.diff.remove {
+      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
+    }
+    .line.highlighted {
+      @apply inline-block w-full bg-slate-400/20;
+    }
+    .highlighted-word {
+      @apply border-border rounded-sm border px-0.5 py-px;
+    }
+  }
+}

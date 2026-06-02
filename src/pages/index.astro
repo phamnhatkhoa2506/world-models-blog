@@ -1,0 +1,170 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import IconRss from "@/assets/icons/IconRss.svg";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import logoSrc from "@/assets/images/logo.png";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Socials from "@/components/Socials.astro";
+import Card from "@/components/Card.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import FloatingDecor from "@/components/decor/FloatingDecor.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const { socials, posts: postsConfig } = config;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+
+const posts = await getCollection("posts");
+const sortedPosts = getSortedPosts(posts);
+const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+const homePath = getRelativeLocaleUrl(locale, "");
+---
+
+<Layout>
+  <FloatingDecor variant="home" />
+  <Header />
+  <main
+    id="main-content"
+    data-layout="index"
+    data-home-path={homePath}
+    class="app-layout relative z-10"
+  >
+    <section id="hero" class="relative border-border border-b pt-10 pb-10">
+      <div class="flex flex-col-reverse items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+        <div class="flex-1">
+          <p class="text-accent text-sm uppercase tracking-[0.2em] font-mono">
+            Nhật ký nghiên cứu · 2026 →
+          </p>
+          <h1
+            class="my-4 font-display text-5xl font-semibold tracking-tight sm:my-6 sm:text-6xl"
+            style="line-height:1.05;letter-spacing:-0.025em;"
+          >
+            World&nbsp;Models <span class="text-accent italic">&amp;</span> RL
+            <br />
+            <span class="text-muted-foreground font-display italic font-medium text-3xl sm:text-4xl">
+              — ghi chú công khai của Khoa
+            </span>
+          </h1>
+        </div>
+        <Image
+          src={logoSrc}
+          alt="World Models & RL logo"
+          width={320}
+          height={320}
+          loading="eager"
+          class="size-32 shrink-0 rounded-full ring-1 ring-border bg-background object-cover shadow-sm sm:size-40 md:size-48 lg:size-56"
+        />
+      </div>
+
+      <p class="mt-2 max-w-2xl text-lg leading-relaxed text-foreground/85">
+        Mình đang tự học World Models và Reinforcement Learning hướng nghiên
+        cứu, bắt đầu từ tháng 5/2026. Blog này là bản polish của các note study
+        — trực giác trước công thức, ví dụ số chạy tay, nối math với code.
+      </p>
+
+      <div class="mt-6 flex items-center gap-4">
+        <LinkButton
+          href={getRelativeLocaleUrl(locale, "posts")}
+          class="bg-accent text-accent-foreground rounded-md px-5 py-2.5 text-sm font-medium no-underline hover:opacity-90"
+        >
+          Đọc bài viết
+          <IconArrowRight class="inline-block ml-1 rtl:-rotate-180" />
+        </LinkButton>
+        <LinkButton
+          href={getRelativeLocaleUrl(locale, "about")}
+          class="text-foreground/80 hover:text-accent text-sm underline decoration-dashed underline-offset-4"
+        >
+          Về Khoa
+        </LinkButton>
+        <a
+          target="_blank"
+          href={getRelativeLocaleUrl(locale, "rss.xml")}
+          aria-label="RSS Feed"
+          title="RSS Feed"
+          class="text-accent hover:text-accent-soft ml-auto"
+        >
+          <IconRss
+            width={20}
+            height={20}
+            class="stroke-current"
+          />
+          <span class="sr-only">RSS Feed</span>
+        </a>
+      </div>
+
+      {
+        socials.length > 0 && (
+          <div class="mt-6 flex max-sm:flex-col sm:items-center text-sm text-muted-foreground">
+            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">
+              {t.home.socialLinks}:
+            </div>
+            <Socials />
+          </div>
+        )
+      }
+    </section>
+
+    {
+      featuredPosts.length > 0 && (
+        <section
+          id="featured"
+          class:list={[
+            "pt-14 pb-8",
+            { "border-border border-b": recentPosts.length > 0 },
+          ]}
+        >
+          <h2 class="font-display text-3xl font-semibold tracking-tight">
+            ✦ {t.home.featured}
+          </h2>
+          <ul>
+            {featuredPosts.map(data => (
+              <Card variant="h3" {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      recentPosts.length > 0 && (
+        <section id="recent-posts" class="pt-14 pb-8">
+          <h2 class="font-display text-3xl font-semibold tracking-tight">
+            {t.home.recentPosts}
+          </h2>
+          <ul>
+            {recentPosts.slice(0, postsConfig.perIndex).map(data => (
+              <Card variant="h3" {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="my-10 text-center">
+      <LinkButton href={getRelativeLocaleUrl(locale, "posts")}>
+        {t.home.allPosts}
+        <IconArrowRight class="inline-block rtl:-rotate-180" />
+      </LinkButton>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
+      ?.dataset;
+    const baseRoot = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+    if (indexLayout?.layout) {
+      sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
+    }
+  });
+</script>

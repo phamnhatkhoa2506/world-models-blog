@@ -1,0 +1,45 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+{/* Đám mây mơ — ẩn dụ "world model imagination" */}
+<svg
+  viewBox="0 0 100 100"
+  aria-hidden="true"
+  class:list={[className]}
+>
+  <circle
+    cx="50"
+    cy="55"
+    r="44"
+    fill="none"
+    stroke="#4f9d83"
+    stroke-width="0.6"
+    stroke-dasharray="2 3"
+    opacity="0.5"></circle>
+  {/* sparkles trên */}
+  <g fill="#e89570">
+    <circle cx="35" cy="20" r="1.6"></circle>
+    <path d="M55,13 l1,3 3,1 -3,1 -1,3 -1,-3 -3,-1 3,-1 z"></path>
+    <circle cx="72" cy="22" r="1.3"></circle>
+    <circle cx="62" cy="28" r="0.9" opacity="0.7"></circle>
+  </g>
+  {/* cloud body */}
+  <path
+    d="M22,68 Q12,68 16,58 Q13,46 25,46 Q28,36 40,40 Q48,30 58,38 Q70,32 76,46 Q88,48 82,60 Q88,70 76,68 Z"
+    fill="#6ab39b"
+    stroke="#4f9d83"
+    stroke-width="1.3"
+    stroke-linejoin="round"></path>
+  {/* highlight */}
+  <path
+    d="M30,52 Q35,48 42,50"
+    fill="none"
+    stroke="#fbfaf7"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    opacity="0.7"></path>
+</svg>
