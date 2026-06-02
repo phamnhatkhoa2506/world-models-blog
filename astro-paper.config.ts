@@ -4,7 +4,7 @@ import { defineAstroPaperConfig } from "./src/types/config";
 // và đồng bộ `base` trong astro.config.ts.
 export default defineAstroPaperConfig({
   site: {
-    url: "https://example.github.io/world-models-blog/",
+    url: "https://phamnhatkhoa2506.github.io/world-models-blog/",
     title: "World Models & RL — Notes của Khoa",
     description:
       "Hành trình tự học World Models và Reinforcement Learning hướng nghiên cứu — note, deep-dive, và companion paper, viết bằng tiếng Việt.",
