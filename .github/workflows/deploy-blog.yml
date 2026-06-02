@@ -3,9 +3,6 @@ name: Deploy blog to GitHub Pages
 on:
   push:
     branches: [main, master]
-    paths:
-      - "blog/**"
-      - ".github/workflows/deploy-blog.yml"
   workflow_dispatch:
 
 permissions:
@@ -20,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: blog
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +35,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: blog/dist
+          path: dist
 
   deploy:
     needs: build
