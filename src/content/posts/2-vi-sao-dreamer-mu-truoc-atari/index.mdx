@@ -1,6 +1,6 @@
 ---
 author: Phạm Nhật Khoa
-pubDatetime: 2026-06-02T20:00:00+07:00
+pubDatetime: 2026-05-25T20:00:00+07:00
 title: "Vì sao Dreamer học được DM Control nhưng 'mù' trước Atari"
 slug: vi-sao-dreamer-mu-truoc-atari
 featured: true
@@ -10,33 +10,38 @@ tags:
   - reinforcement-learning
   - dreamer
   - compute
+  - dm-control
+  - atari 
+  - OpenAI-Gym
 description: >-
   Mình tự viết Dreamer V1 từ đầu và cho nó chạy trên 5 môi trường. Bài này kể lại cặp tương phản sắc nét nhất: Atari Pong kẹt cứng ở -21 trong khi DM Control cheetah-run đạt 646/1000 — và bài học về bức tường compute mà một researcher solo, ít tài nguyên như mình phải đối mặt.
 ---
 
+import PongReconstruction from "./Pong_reconstruction.png"
+
 ## Table of contents
 
-## 0. Mở đầu: một thí nghiệm từ ghế solo
+## 1. Mở đầu
 
-Mình là sinh viên tự học RL và World Models ở Việt Nam, không có advisor, compute giới hạn (thuê GPU theo giờ trên cloud). Sau một thời gian dài học lý thuyết, mình quyết định **tự viết Dreamer V1 từ đầu** — một file, kiểu CleanRL — rồi cho nó chạy lần lượt trên nhiều môi trường để xem mình *thật sự* hiểu nó tới đâu.
+Chào các bạn, sau khi nghiên cứu về Dreamer V1 và viết một bài post trước đó ([Link](/posts/dreamer-v1-la-gi/)), mình quyết định **tự kiểm chứng Dreamer V1 từ đầu** bằng cách chạy lần lượt trên nhiều môi trường để xem mình *thật sự* hiểu nó tới đâu.
 
-Kết quả thú vị nhất không phải là lúc nó chạy được, mà là lúc nó **không** chạy được. Cụ thể: cùng một lõi code, Dreamer học chơi cheetah-run (DM Control) khá tốt, nhưng đứng hình hoàn toàn trên Atari Pong. Truy ra *vì sao* dạy mình nhiều hơn mọi thành công cộng lại — và nó chạm thẳng vào một câu hỏi sống còn với người ít compute: **những hướng nào trong World Models là khả thi cho mình, và những hướng nào là bức tường?**
+Kết quả thú vị nhất không phải là lúc nó chạy được, mà là lúc nó **không** chạy được. Cụ thể: cùng một lõi code, Dreamer học chơi cheetah-run (DM Control) khá tốt, nhưng đứng hình hoàn toàn trên Atari Pong. Mình thấy rằng mình nhận được nhiều bài học từ việc thử nghiệm trên, không chỉ là từ những thành công mà Dreamer V1 đã public mà còn là sự thất bại của nó trên nhiều task và mình nghĩ nó thực sự hữu ích cho những ai yêu thích về World Models nhưng hạn chế về tài nguyên tính toán. Bài viết này sẽ giúp các bạn hiểu được: **những hướng nào trong World Models là khả thi cho mình, và những hướng nào là bức tường?**
 
-Bài này kể lại câu chuyện đó, đủ chi tiết kỹ thuật để bạn tự kiểm chứng, nhưng trọng tâm là *cách đọc tín hiệu để chẩn đoán* — thứ mình nghĩ quan trọng hơn bản thân con số.
+Bài post này nói về thực nghiệm của mình, đủ chi tiết kỹ thuật để bạn tự kiểm chứng, nhưng trọng tâm là *cách đọc tín hiệu để chẩn đoán*, thứ mình nghĩ quan trọng hơn bản thân con số.
 
-## 1. Dreamer V1 trong một phút
+## 2. Dreamer V1 trong một phút
 
-Để bài này tự đứng được, đây là Dreamer V1 gói gọn (chi tiết hơn ở các note học của mình):
+Mình sẽ gói gọn lý thuyết về Dreamer V1 lại như sau để các bạn khởi động trước khi xem thực nghiệm.
 
-Dreamer học một **world model** — một mô hình mô phỏng môi trường trong không gian ẩn (latent). Nó gồm:
+Dreamer học một **world model** - một mô hình mô phỏng môi trường trong không gian ẩn (latent). Nó gồm:
 
 - **Encoder + RSSM**: nén quan sát $o_t$ thành trạng thái ẩn $(h_t, z_t)$ — phần xác định $h_t$ (GRU) + phần ngẫu nhiên $z_t$.
 - **Decoder, reward predictor**: từ $(h_t, z_t)$ tái tạo lại quan sát và dự đoán phần thưởng.
 - **Actor + Critic**: học hành vi **hoàn toàn bên trong giấc mơ** — Dreamer tưởng tượng ra các chuỗi trạng thái tương lai bằng world model, rồi tối ưu actor trên những chuỗi tưởng tượng đó, không cần đụng môi trường thật.
 
-Điểm cốt lõi cần nhớ cho bài này: **actor chỉ giỏi tới mức world model cho phép.** Nếu world model không nắm được một thứ quan trọng trong môi trường, thì giấc mơ thiếu thứ đó, và actor học trong một thế giới sai lệch.
+Điểm cốt lõi cần nhớ cho bài này: **actor chỉ giỏi tới mức world model cho phép.** Nếu world model không nắm được một thứ quan trọng trong môi trường, thì imagination thiếu thứ đó, và actor học trong một thế giới sai lệch.
 
-## 2. Năm môi trường, ba kết cục
+## 3. Bốn môi trường, ba kết cục
 
 Mình cho cùng một lõi Dreamer V1 chạy trên:
 
@@ -47,9 +52,9 @@ Mình cho cùng một lõi Dreamer V1 chạy trên:
 | **Atari Pong** | rời rạc | **ảnh (pixel)** | **kẹt -21 (thua trắng)** |
 | **DM Control cheetah-run** | liên tục | **vector (proprioceptive)** | **646/1000** |
 
-Hai dòng cuối là trọng tâm. Cùng một thuật toán, một bên thất bại hoàn toàn, một bên thành công — khác biệt nằm ở **bản chất quan sát** (ảnh vs vector) và **lượng compute cần thiết**.
+Hai dòng cuối là trọng tâm. Cùng một thuật toán, một bên thất bại hoàn toàn, một bên thành công, khác biệt nằm ở **bản chất quan sát** (ảnh vs vector) và **lượng compute cần thiết**.
 
-## 3. Atari Pong: agent đứng hình ở -21
+## 4. Atari Pong: agent đứng hình ở -21
 
 Pong cho phần thưởng $+1$ khi ghi điểm, $-1$ khi bị ghi, $0$ phần lớn thời gian. Một agent ngẫu nhiên thua trắng: $-21$. Sau hàng chục nghìn bước huấn luyện, agent của mình vẫn... $-21$. Không nhúc nhích.
 
@@ -73,10 +78,11 @@ Tức là con số $3764$ trông như **tái tạo gần hoàn hảo**. Nếu ch
 
 May là mình có log ảnh thật và ảnh tái tạo cạnh nhau lên TensorBoard. Khi mở ra:
 
-```
-Thật:     [ · ·  o  · · · |  · · ]   ← có bóng (o) và vợt (|)
-Tái tạo:  [ · · · · · · · · · · · ]   ← chỉ một nền xám, KHÔNG có bóng
-```
+<figure style="text-align: center">
+  <img src={PongReconstruction.src} alt="Reconstruction của Pong"
+  width="400" />
+  <figcaption>Reconstruction của Pong</figcaption>
+</figure>
 
 World model tái tạo nền và khung sân hoàn hảo, nhưng **bóng và vợt biến mất**. Mà bóng chính là thứ quan trọng nhất để chơi Pong.
 
@@ -96,7 +102,7 @@ recon không phạt việc thiếu bóng
 
 **Bài học chẩn đoán quan trọng nhất:** ban đầu mình nghi cơ chế gradient của actor yếu, định đi sửa actor. Ảnh tái tạo bác bỏ điều đó: gốc rễ nằm ở **world model mù**, không phải actor. Không actor nào học chơi được trong một thế giới không có bóng. *Luôn kiểm tra world model có nắm được thứ quan trọng hay không, trước khi đổ lỗi cho actor.*
 
-## 4. DM Control cheetah-run: cùng lõi code, lại thành công
+## 5. DM Control cheetah-run: cùng lõi code, lại thành công
 
 Mình chuyển sang DM Control với quan sát **proprioceptive** — không phải ảnh, mà là một vector trạng thái (góc khớp, vận tốc...). Gỡ phần CNN, giữ nguyên lõi Dreamer. Kết quả:
 
@@ -123,21 +129,21 @@ Hạ `FREE_NATS` xuống $1.0$ (dưới mức KL tự nhiên $\approx 1.7$):
 
 Đây là kiểu tinh chỉnh mình thích: **không mò, mà đọc tín hiệu** (`kl_raw` so với sàn) rồi chỉnh đúng chỗ. Quy tắc rút ra: *đặt free nats DƯỚI mức KL tự nhiên của bài toán (để không nuốt gradient), nhưng TRÊN 0 (để chống sụp đổ).*
 
-## 5. Bài học lớn: bức tường compute của pixel
+## 6. Bài học lớn: bức tường compute của pixel
 
 Đây là phần mình muốn nói thẳng với những ai cũng ít tài nguyên như mình.
 
-Atari Pong **không phải không giải được** bằng Dreamer — DreamerV2 làm được. Nhưng benchmark Atari chuẩn dùng ngân sách cỡ **200 triệu frame**. Lần chạy của mình: $\sim 400{,}000$ frame — tức **0,2%**. Ở mức đó, ngay cả khi mọi thứ đúng, world model cũng chưa kịp tích lũy đủ gradient để học vẽ một quả bóng vài pixel.
+Atari Pong **không phải không giải được** bằng Dreamer — DreamerV2 làm được. Nhưng benchmark Atari chuẩn dùng ngân sách cỡ **200 triệu frame**. Lần chạy của mình: $\sim 400,000$ frame — tức **0,2%**. Ở mức đó, ngay cả khi mọi thứ đúng, world model cũng chưa kịp tích lũy đủ gradient để học vẽ một quả bóng vài pixel.
 
-Ngược lại, cheetah-run proprio đạt $646$ chỉ với $400{,}000$ frame — nằm gọn trong tầm compute của mình.
+Ngược lại, cheetah-run proprio đạt $646$ chỉ với $400,000$ frame — nằm gọn trong tầm compute của mình.
 
-> Cùng một thuật toán. Một bên là bức tường (pixel, cần compute cỡ phòng lab lớn), một bên là vùng đất màu mỡ (proprio/vector, compute-light vẫn năng suất).
+Cùng một thuật toán. Một bên là bức tường (pixel, cần compute cỡ phòng lab lớn), một bên là vùng đất màu mỡ (proprio/vector, compute-light vẫn năng suất).
 
 Điều này **không** phải thất bại của code — toàn bộ máy móc (RSSM, imagination, λ-return, actor-critic, return normalization) đều chạy đúng, đã chứng minh trên proprio. Nó là **dữ liệu chiến lược**: với một researcher solo ít compute, đua các benchmark pixel-SOTA (Atari, video world models kiểu Sora) là đâm đầu vào tường. Hướng khả thi nằm ở **môi trường vector/proprio, hiệu quả mẫu (sample-efficiency), và phương pháp luận** — nơi một ý tưởng tốt quan trọng hơn một cụm GPU lớn.
 
 Mình biết điều này không phải vì đọc được ở đâu, mà vì **tự tay đâm vào bức tường**. Đó là khác biệt giữa biết-trên-giấy và biết-trong-xương.
 
-## 6. Những bài học về phương pháp (giá trị hơn cả con số)
+## 7. Những bài học về phương pháp (giá trị hơn cả con số)
 
 Gói lại những thứ mình sẽ mang theo:
 
@@ -151,10 +157,10 @@ Gói lại những thứ mình sẽ mang theo:
 
 5. **Biết bức tường compute của mình ở đâu.** Không phải để bỏ cuộc, mà để chọn trận đánh thắng được.
 
-## 7. Kết
+## 8. Kết luận
 
 Từ ghế của một người học solo, mình thấy bài học lớn nhất không phải "Dreamer đạt 646 trên cheetah". Mà là: **cùng một công cụ có thể là chìa khóa ở môi trường này và là bức tường ở môi trường kia — và việc của người ít tài nguyên là phân biệt được hai cái đó *trước khi* đốt sạch ngân sách.**
 
 Pong dạy mình điều đó rõ hơn mọi lần thành công. Một world model mù với quả bóng, một dòng recon loss trông đẹp mà lừa người, và một bức tường $200$ triệu frame mình không thể trèo qua — tất cả gói lại thành một định hướng: đi vào nơi compute-light vẫn có chỗ đứng.
 
-> **Câu cất.** Đọc paper cho mình từ vựng; tự tay gõ code và đâm vào tường cho mình bản đồ — bản đồ về nơi nào nên đi và nơi nào, với nguồn lực của mình, là vực thẳm.
+Đọc paper cho mình từ vựng; tự tay gõ code và đâm vào tường cho mình bản đồ — bản đồ về nơi nào nên đi và nơi nào, với nguồn lực của mình, là vực thẳm.
